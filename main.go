@@ -24,55 +24,58 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/fabiant7t/hobot/cmd"
 	"github.com/fabiant7t/hobot/cmd/configcmd"
 	"github.com/fabiant7t/hobot/cmd/servercmd"
 	"github.com/fabiant7t/hobot/internal/configfile"
+	"github.com/fabiant7t/hobot/internal/statefile"
 	"github.com/spf13/cobra"
 )
 
 var (
 	config  string
+	state   string
 	context string
 )
 
 func main() {
+	defaultConfig, err := configfile.DefaultLocation()
+	cobra.CheckErr(err)
+	defaultState, err := statefile.DefaultLocation()
+	cobra.CheckErr(err)
+	defaultContext := "default"
+
 	rootCmd := &cobra.Command{
 		Use:   "hobot COMMAND SUBCOMMAND [options]",
 		Short: "Hetzner Robot API CLI",
 		Long:  "A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt",
 	}
-	rootCmd.PersistentFlags().StringVar(&config, "config", "", "config file (default is $HOME/.config/hobot/config.ini)")
-	rootCmd.PersistentFlags().StringVar(&context, "context", "", "default")
+	rootCmd.PersistentFlags().StringVar(&config, "config", "", fmt.Sprintf(`config file (default is "%s")`, defaultConfig))
+	rootCmd.PersistentFlags().StringVar(&state, "state", "", fmt.Sprintf(`state file (default is "%s")`, defaultState))
+	rootCmd.PersistentFlags().StringVar(&context, "context", "", fmt.Sprintf(`default is "%s"`, defaultContext))
 
-	// Configure config
-	if config == "" { // default to $HOME/.config/hobot/config.ini
-		home, err := os.UserHomeDir()
+	if config == "" {
+		config = defaultConfig
+		created, err := createIfNotExists(config, configfile.Create)
 		cobra.CheckErr(err)
-		config = filepath.Join(home, ".config", "hobot", "config.ini")
-	} else if strings.HasPrefix(config, "~") { // resolve ~
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-		config = strings.Replace(config, "~", home, 1)
-	}
-	_, err := os.Stat(config)
-	if err != nil {
-		if os.IsNotExist(err) {
-			err := configfile.Create(config)
-			cobra.CheckErr(err)
-			fmt.Println("The config file was missing and got created for you!")
-			fmt.Printf("TODO: Edit %s and set your robot credentials!\n", config)
+		if created {
+			os.Stderr.WriteString(fmt.Sprintf("Created \"%s\" for you. Edit the file and enter your real credentials!\n", config))
 		}
 	}
-
-	// Configure context
-	if context == "" {
-		currentContext, err := configfile.CurrentContext(config)
+	if state == "" {
+		state = defaultState
+		_, err := createIfNotExists(state, statefile.Create)
 		cobra.CheckErr(err)
-		context = currentContext
+	}
+	if context == "" {
+		savedContext, err := statefile.GetContext(state)
+		cobra.CheckErr(err)
+		if savedContext == "" {
+			context = defaultContext
+		} else {
+			context = savedContext
+		}
 	}
 
 	// Mount commands
@@ -81,4 +84,18 @@ func main() {
 	rootCmd.AddCommand(cmd.VersionCmd)
 
 	rootCmd.Execute()
+}
+
+func createIfNotExists(path string, f func(string) error) (bool, error) {
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err := f(path)
+			if err != nil {
+				return false, err
+			}
+			return true, nil
+		}
+	}
+	return false, nil
 }

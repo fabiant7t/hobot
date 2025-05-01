@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/fabiant7t/hobot/pkg/ini"
+	"github.com/fabiant7t/hobot/internal/configfile"
+	"github.com/fabiant7t/hobot/internal/statefile"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +13,7 @@ var useContextCommand = &cobra.Command{
 	Use:     "use-context CONTEXT_NAME",
 	Aliases: []string{"use"},
 	Short:   "Use given context",
-	Long:    "Sets the given context in the config file",
+	Long:    "Sets the given context in the state file",
 	Example: "hobot config use-context private",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
@@ -21,19 +22,25 @@ var useContextCommand = &cobra.Command{
 		contextName := args[0]
 		config, err := cmd.Flags().GetString("config")
 		if err != nil {
-			return fmt.Errorf("error: cannot get flag config: %w", err)
+			return fmt.Errorf("error: cannot get state flag: %w", err)
 		}
-		cfg, err := ini.NewFromFile(config)
+		configuredContexts, err := configfile.GetContexts(config)
+		cobra.CheckErr(err)
+		isValid := false
+		for _, cn := range configuredContexts {
+			if cn == contextName {
+				isValid = true
+			}
+		}
+		if !isValid {
+			return fmt.Errorf(`Context "%s" is not configured in "%s"`, contextName, config)
+		}
+		state, err := cmd.Flags().GetString("state")
 		if err != nil {
-			return fmt.Errorf("error: cannot load config file: %w", err)
+			return fmt.Errorf("error: cannot get state flag: %w", err)
 		}
-		if !cfg.HasSection(contextName) {
-			return fmt.Errorf("error: no context exists with the name: %s", contextName)
-		}
-		cfg.DefaultSection().Set("context", contextName)
-		if err := cfg.SaveToFile(config); err != nil {
-			return fmt.Errorf("error: cannot write config file: %w", err)
-		}
+		err = statefile.SetContext(state, contextName)
+		cobra.CheckErr(err)
 		fmt.Printf("Switched to context \"%s\".\n", contextName)
 		return nil
 	},

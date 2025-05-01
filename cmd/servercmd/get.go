@@ -2,8 +2,10 @@ package servercmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/fabiant7t/hobot/internal/configfile"
@@ -11,12 +13,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listCommand = &cobra.Command{
-	Use:     "list",
-	Short:   "List servers",
-	Long:    "List servers",
-	Example: "hobot server list",
+var getCommand = &cobra.Command{
+	Use:     "get SERVER_NUMBER",
+	Short:   "Get server",
+	Long:    "Get server",
+	Example: "hobot server get 123456",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			return errors.New("error: missing server number argument")
+		}
+		serverNumber, err := strconv.Atoi(args[0])
+		cobra.CheckErr(err)
+
 		contextFlag, err := cmd.Flags().GetString("context")
 		cobra.CheckErr(err)
 		configFlag, err := cmd.Flags().GetString("config")
@@ -28,14 +36,12 @@ var listCommand = &cobra.Command{
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		servers, err := server.ListServers(ctx, credentials.User, credentials.Password, &http.Client{})
+		srv, err := server.GetServer(ctx, serverNumber, credentials.User, credentials.Password, &http.Client{})
 		if err != nil {
-			return fmt.Errorf("error listing servers: %w", err)
+			return fmt.Errorf("error getting server: %w", err)
 		}
 
-		for _, srv := range servers {
-			fmt.Println(srv.String())
-		}
+		fmt.Printf(srv.String())
 		return nil
 	},
 }
