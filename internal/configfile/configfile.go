@@ -42,7 +42,7 @@ func Create(path string) error {
 }
 
 func GetContexts(path string) ([]string, error) {
-	contexts := []string{}
+	var contexts []string
 	config, err := ini.NewFromFile(path)
 	if err != nil {
 		return contexts, fmt.Errorf("error loading config file: %w", err)

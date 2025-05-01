@@ -22,6 +22,7 @@ THE SOFTWARE.
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -34,47 +35,63 @@ import (
 )
 
 var (
-	config  string
-	state   string
-	context string
+	configFile  string
+	stateFile   string
+	contextName string
 )
 
 func main() {
-	defaultConfig, err := configfile.DefaultLocation()
+	defaultConfigFile, err := configfile.DefaultLocation()
 	cobra.CheckErr(err)
-	defaultState, err := statefile.DefaultLocation()
+	defaultStateFile, err := statefile.DefaultLocation()
 	cobra.CheckErr(err)
-	defaultContext := "default"
+	defaultContextName := "default"
 
 	rootCmd := &cobra.Command{
 		Use:   "hobot COMMAND SUBCOMMAND [options]",
 		Short: "Hetzner Robot API CLI",
 		Long:  "A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// Set user and password as context values for sub commands to use
+			configFile, err := cmd.Flags().GetString("config")
+			cobra.CheckErr(err)
+			contextName, err := cmd.Flags().GetString("context")
+			cobra.CheckErr(err)
+			credentials, err := configfile.GetCredentials(configFile, contextName)
+			cobra.CheckErr(err)
+			cmd.SetContext(
+				context.WithValue(
+					context.WithValue(cmd.Context(), "user", credentials.User),
+					"password",
+					credentials.Password,
+				),
+			)
+		},
 	}
-	rootCmd.PersistentFlags().StringVar(&config, "config", "", fmt.Sprintf(`config file (default is "%s")`, defaultConfig))
-	rootCmd.PersistentFlags().StringVar(&state, "state", "", fmt.Sprintf(`state file (default is "%s")`, defaultState))
-	rootCmd.PersistentFlags().StringVar(&context, "context", "", fmt.Sprintf(`default is "%s"`, defaultContext))
+	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", fmt.Sprintf(`config file (default is "%s")`, defaultConfigFile))
+	rootCmd.PersistentFlags().StringVar(&stateFile, "state", "", fmt.Sprintf(`state file (default is "%s")`, defaultStateFile))
+	rootCmd.PersistentFlags().StringVar(&contextName, "context", "", fmt.Sprintf(`default is "%s"`, defaultContextName))
 
-	if config == "" {
-		config = defaultConfig
-		created, err := createIfNotExists(config, configfile.Create)
+	if configFile == "" {
+		configFile = defaultConfigFile
+		created, err := createIfNotExists(configFile, configfile.Create)
 		cobra.CheckErr(err)
 		if created {
-			os.Stderr.WriteString(fmt.Sprintf("Created \"%s\" for you. Edit the file and enter your real credentials!\n", config))
+			os.Stderr.WriteString(fmt.Sprintf("Created \"%s\" for you. Edit the file and enter your real credentials!\n", configFile))
 		}
 	}
-	if state == "" {
-		state = defaultState
-		_, err := createIfNotExists(state, statefile.Create)
+	if stateFile == "" {
+		stateFile = defaultStateFile
+		_, err := createIfNotExists(stateFile, statefile.Create)
 		cobra.CheckErr(err)
 	}
-	if context == "" {
-		savedContext, err := statefile.GetContext(state)
+	if contextName == "" {
+		savedContext, err := statefile.GetContext(stateFile)
 		cobra.CheckErr(err)
 		if savedContext == "" {
-			context = defaultContext
+			contextName = defaultContextName
 		} else {
-			context = savedContext
+			contextName = savedContext
 		}
 	}
 

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fabiant7t/hobot/internal/configfile"
 	"github.com/fabiant7t/hobot/internal/server"
 	"github.com/spf13/cobra"
 )
@@ -17,22 +16,18 @@ var listCommand = &cobra.Command{
 	Long:    "List servers",
 	Example: "hobot server list",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		contextFlag, err := cmd.Flags().GetString("context")
-		cobra.CheckErr(err)
-		configFlag, err := cmd.Flags().GetString("config")
-		cobra.CheckErr(err)
-
-		credentials, err := configfile.GetCredentials(configFlag, contextFlag)
-		cobra.CheckErr(err)
-
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 		defer cancel()
 
-		servers, err := server.ListServers(ctx, credentials.User, credentials.Password, &http.Client{})
+		servers, err := server.ListServers(
+			ctx,
+			cmd.Context().Value("user").(string),
+			cmd.Context().Value("password").(string),
+			&http.Client{},
+		)
 		if err != nil {
 			return fmt.Errorf("error listing servers: %w", err)
 		}
-
 		for _, srv := range servers {
 			fmt.Println(srv.String())
 		}
