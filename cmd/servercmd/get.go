@@ -2,7 +2,6 @@ package servercmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,14 +13,12 @@ import (
 )
 
 var getCommand = &cobra.Command{
-	Use:     "get SERVER_NUMBER",
+	Use:     "get [SERVER_NUMBER]",
 	Short:   "Get server",
 	Long:    "Get server",
 	Example: "hobot server get 123456",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 0 {
-			return errors.New("error: missing server number argument")
-		}
 		serverNumber, err := strconv.Atoi(args[0])
 		cobra.CheckErr(err)
 
