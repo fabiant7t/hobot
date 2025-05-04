@@ -70,6 +70,6 @@ func (srv *DetailedServer) String() string {
 }
 
 type Subnet struct {
-	IP   string `json:"ip"`
-	Mask string `json:"mask"`
+	IP   string `json:"ip" yaml:"ip"`
+	Mask string `json:"mask" yaml:"mask"`
 }
