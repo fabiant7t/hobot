@@ -58,7 +58,7 @@ func (p *TablePrinter[T]) Render(s T) ([]byte, error) {
 	for i, k := range p.fieldNames {
 		v, ok := m[k]
 		if ok {
-			values[i] = fmt.Sprintf("%v", v)
+			values[i] = fmt.Sprintf("%+v", v)
 		} else {
 			values[i] = ""
 		}
