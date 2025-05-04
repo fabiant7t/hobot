@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fabiant7t/hobot/internal/server"
@@ -42,7 +43,11 @@ func NewListCommand() *cobra.Command {
 			case "yaml":
 				p = &printer.YAMLPrinter[*server.Server]{}
 			default:
-				p = &printer.TablePrinter[*server.Server]{WithHeader: !noHeaders}
+				tp := &printer.TablePrinter[*server.Server]{WithHeader: !noHeaders}
+				if after, found := strings.CutPrefix(outputFormat, "table="); found {
+					tp.SetFieldNames(strings.Split(after, ","))
+				}
+				p = tp
 			}
 			if err := p.PrintAll(servers, os.Stdout); err != nil {
 				return fmt.Errorf("error printing all servers: %w", err)
@@ -51,6 +56,6 @@ func NewListCommand() *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&noHeaders, "no-headers", false, "Do not print headers in the output")
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format. One of (table, json, yaml)")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format. One of (table, json, yaml). Table also supports selecting custom fields using the syntax `table=Foo,Bar,Baz`.")
 	return cmd
 }
