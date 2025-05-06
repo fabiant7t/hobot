@@ -27,8 +27,15 @@ func ListServers(ctx context.Context, user, password string, client *http.Client
 		return servers, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return servers, fmt.Errorf("error: API did not respond with status 200: %d", res.StatusCode)
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return nil, errors.New("no servers found")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
 	}
 
 	b, err := io.ReadAll(res.Body)
@@ -63,6 +70,7 @@ func GetServer(ctx context.Context, serverNumber int, user, password string, cli
 		return nil, err
 	}
 	defer res.Body.Close()
+
 	switch res.StatusCode {
 	case http.StatusNotFound:
 		return nil, fmt.Errorf("server %d not found", serverNumber)
@@ -103,6 +111,7 @@ func RenameServer(ctx context.Context, serverNumber int, serverName, user, passw
 		return nil, err
 	}
 	defer res.Body.Close()
+
 	switch res.StatusCode {
 	case http.StatusNotFound:
 		return nil, fmt.Errorf("server %d not found", serverNumber)
