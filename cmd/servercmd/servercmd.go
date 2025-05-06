@@ -14,5 +14,7 @@ func New() *cobra.Command {
 	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewNumberCommand())
 	cmd.AddCommand(NewRenameCommand())
+	cmd.AddCommand(NewResetCommand())
+	cmd.AddCommand(NewResetOptionsCommand())
 	return cmd
 }
