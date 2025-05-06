@@ -15,11 +15,11 @@ var useContextCommand = &cobra.Command{
 	Long:    "Sets the given context in the state file",
 	Example: "hobot config use-context private",
 	Args:    cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		contextName := args[0]
 		config, err := cmd.Flags().GetString("config")
 		if err != nil {
-			return fmt.Errorf("error: cannot get state flag: %w", err)
+			cobra.CheckErr(fmt.Errorf("error: cannot get config flag: %w", err))
 		}
 		configuredContexts, err := configfile.GetContexts(config)
 		cobra.CheckErr(err)
@@ -30,15 +30,13 @@ var useContextCommand = &cobra.Command{
 			}
 		}
 		if !isValid {
-			return fmt.Errorf(`Context "%s" is not configured in "%s"`, contextName, config)
+			cobra.CheckErr(fmt.Errorf(`Context "%s" is not configured in "%s"`, contextName, config))
 		}
 		state, err := cmd.Flags().GetString("state")
 		if err != nil {
-			return fmt.Errorf("error: cannot get state flag: %w", err)
+			cobra.CheckErr(fmt.Errorf("error: cannot get state flag: %w", err))
 		}
-		err = statefile.SetContext(state, contextName)
-		cobra.CheckErr(err)
+		cobra.CheckErr(statefile.SetContext(state, contextName))
 		fmt.Printf("Switched to context \"%s\".\n", contextName)
-		return nil
 	},
 }

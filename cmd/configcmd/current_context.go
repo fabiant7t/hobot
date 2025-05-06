@@ -11,12 +11,9 @@ var currentContextCommand = &cobra.Command{
 	Short:   "Display the current-context",
 	Long:    "Display the current-context",
 	Example: "hobot config current-context",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		context, err := cmd.Flags().GetString("context")
-		if err != nil {
-			return err
-		}
+		cobra.CheckErr(fmt.Errorf("error: cannot get context flag: %w", err))
 		fmt.Println(context)
-		return nil
 	},
 }

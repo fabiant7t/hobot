@@ -12,16 +12,15 @@ var getContextsCommand = &cobra.Command{
 	Short:   "Describe one or more contexts",
 	Long:    "Describe one or more contexts",
 	Example: "hobot config get-contexts",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		config, err := cmd.Flags().GetString("config")
 		if err != nil {
-			return fmt.Errorf("error: cannot get flag config: %w", err)
+			cobra.CheckErr(fmt.Errorf("error: cannot get flag config: %w", err))
 		}
 		contexts, err := configfile.GetContexts(config)
 		cobra.CheckErr(err)
 		for _, contextName := range contexts {
 			fmt.Println(contextName)
 		}
-		return nil
 	},
 }
