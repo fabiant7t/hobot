@@ -1,4 +1,4 @@
-VERSION := v0.0.1
+VERSION := $(shell git tag --points-at HEAD --sort=-version:refname)
 	
 build:
 	go build \
