@@ -70,7 +70,7 @@ func main() {
 	}
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", fmt.Sprintf(`config file (default is "%s")`, defaultConfigFile))
 	rootCmd.PersistentFlags().StringVar(&stateFile, "state", "", fmt.Sprintf(`state file (default is "%s")`, defaultStateFile))
-	rootCmd.PersistentFlags().StringVar(&contextName, "context", "", fmt.Sprintf(`default is "%s"`, defaultContextName))
+	rootCmd.PersistentFlags().StringVar(&contextName, "context", "", fmt.Sprintf(`default is read from state file or "%s"`, defaultContextName))
 
 	if configFile == "" {
 		configFile = defaultConfigFile
@@ -100,7 +100,9 @@ func main() {
 	rootCmd.AddCommand(servercmd.New())
 	rootCmd.AddCommand(cmd.VersionCmd)
 
-	rootCmd.Execute()
+	if err = rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
 
 func createIfNotExists(path string, f func(string) error) (bool, error) {

@@ -12,5 +12,6 @@ func New() *cobra.Command {
 	}
 	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewGetCommand())
+	cmd.AddCommand(NewNumberCommand())
 	return cmd
 }
