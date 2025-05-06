@@ -95,7 +95,7 @@ func NewNumberCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Server Name")
 	cmd.Flags().StringVar(&ip, "ip", "", "Server IP (can be IPv4 or IPv6)")
 	cmd.Flags().BoolVarP(&ignoreCase, "ignore-case", "i", false, "Ignore case when matching (default is false)")
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "raw", "Output format. One of (raw, json, yaml). `.")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format. One of (table, json, yaml).")
 	cmd.Flags().BoolVar(&noHeaders, "no-headers", false, "Do not print headers in the output")
 	return cmd
 }
