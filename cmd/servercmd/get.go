@@ -20,11 +20,17 @@ func NewGetCommand() *cobra.Command {
 		outputFormat string
 	)
 	cmd := &cobra.Command{
-		Use:     "get [SERVER_NUMBER]",
-		Short:   "Get server",
-		Long:    "Get server",
-		Example: "hobot server get 123456",
-		Args:    cobra.ExactArgs(1),
+		Use:   "get [SERVER_NUMBER]",
+		Short: "Get server",
+		Long:  "Get server",
+		Example: strings.Join([]string{
+			"hobot server get 123456",
+			"hobot server get 123456 -o table --no-headers",
+			"hobot server get 123456 -o table=ServerNumber,ServerIP,ServerName",
+			"hobot server get 123456 -o json",
+			"hobot server get 123456 -o yaml",
+		}, "\n"),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 			defer cancel()
@@ -61,6 +67,6 @@ func NewGetCommand() *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&noHeaders, "no-headers", false, "Do not print headers in the output")
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format. One of (table, json, yaml). Table also supports selecting custom fields using the syntax `table=Foo,Bar,Baz`.")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", `Output format (table, json, yaml). Table also supports selcting custom fields using "table=Foo,Bar,Baz" syntax.`)
 	return cmd
 }
