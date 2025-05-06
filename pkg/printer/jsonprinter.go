@@ -4,16 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"runtime"
 )
 
 type JSONPrinter[T any] struct{}
 
+func (p *JSONPrinter[T]) PrintNewLine(w io.Writer) error {
+	nl := []byte("\n")
+	if runtime.GOOS == "windows" {
+		nl = []byte("\r\n")
+	}
+	_, err := w.Write(nl)
+	return err
+}
+
 func (p *JSONPrinter[T]) Render(s T) ([]byte, error) {
-	return json.MarshalIndent(s, " ", "  ")
+	return json.MarshalIndent(s, "", "  ")
 }
 
 func (p *JSONPrinter[T]) RenderAll(slice []T) ([]byte, error) {
-	return json.MarshalIndent(slice, " ", "  ")
+	return json.MarshalIndent(slice, "", "  ")
 }
 
 func (p *JSONPrinter[T]) Print(s T, w io.Writer) error {
@@ -24,7 +34,7 @@ func (p *JSONPrinter[T]) Print(s T, w io.Writer) error {
 	if _, err := w.Write(b); err != nil {
 		return fmt.Errorf("error writing: %w", err)
 	}
-	return nil
+	return p.PrintNewLine(w)
 }
 
 func (p *JSONPrinter[T]) PrintAll(slice []T, w io.Writer) error {
@@ -35,5 +45,5 @@ func (p *JSONPrinter[T]) PrintAll(slice []T, w io.Writer) error {
 	if _, err := w.Write(b); err != nil {
 		return fmt.Errorf("error writing: %w", err)
 	}
-	return nil
+	return p.PrintNewLine(w)
 }
