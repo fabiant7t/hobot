@@ -5,18 +5,22 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/fabiant7t/hobot/internal/server"
+	"github.com/fabiant7t/hobot/pkg/printer"
 	"github.com/spf13/cobra"
 )
 
 func NewNumberCommand() *cobra.Command {
 	var (
-		ip         string
-		name       string
-		ignoreCase bool
+		ignoreCase   bool
+		ip           string
+		name         string
+		noHeaders    bool
+		outputFormat string
 	)
 	cmd := &cobra.Command{
 		Use:   "number",
@@ -31,10 +35,10 @@ func NewNumberCommand() *cobra.Command {
 			},
 			"\n",
 		),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			// At least one of ip and name must be provided
 			if ip == "" && name == "" {
-				return errors.New("at least one of --ip or --name must be provided")
+				cobra.CheckErr(errors.New("at least one of --ip or --name must be provided"))
 			}
 
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
@@ -47,7 +51,7 @@ func NewNumberCommand() *cobra.Command {
 				&http.Client{},
 			)
 			if err != nil {
-				return fmt.Errorf("error listing servers: %w", err)
+				cobra.CheckErr(fmt.Errorf("error listing servers: %w", err))
 			}
 
 			var matchingSrvs []*server.Server
@@ -56,24 +60,40 @@ func NewNumberCommand() *cobra.Command {
 					matchingSrvs = append(matchingSrvs, srv)
 				}
 			}
-			switch n := len(matchingSrvs); n {
-			case 0:
-				return errors.New("no matching server found")
-			case 1:
-				fmt.Println(matchingSrvs[0].ServerNumber)
-				return nil
-			default:
+			if n := len(matchingSrvs); n == 0 { // not found
+				cobra.CheckErr(errors.New("no matching server found"))
+			} else if n > 1 { // ambiguous
 				results := make([]string, n)
 				for i, srv := range matchingSrvs {
 					results[i] = fmt.Sprintf("%d", srv.ServerNumber)
 				}
-				return fmt.Errorf("more than one server matches: %s", strings.Join(results, ", "))
+				cobra.CheckErr(fmt.Errorf("more than one server matches: %s", strings.Join(results, ", ")))
 			}
+			type MatchingServer struct {
+				ServerNumber int `json:"server_number"`
+			}
+			result := &MatchingServer{ServerNumber: matchingSrvs[0].ServerNumber}
+
+			var p printer.RendererPrinter[*MatchingServer]
+			switch outputFormat {
+			case "json":
+				p = &printer.JSONPrinter[*MatchingServer]{}
+			case "yaml":
+				p = &printer.YAMLPrinter[*MatchingServer]{}
+			default:
+				p = &printer.TablePrinter[*MatchingServer]{WithHeader: !noHeaders}
+			}
+			if err := p.Print(result, os.Stdout); err != nil {
+				cobra.CheckErr(fmt.Errorf("error printing all servers: %w", err))
+			}
+
 		},
 	}
 	cmd.Flags().StringVarP(&name, "name", "n", "", "Server Name")
 	cmd.Flags().StringVar(&ip, "ip", "", "Server IP (can be IPv4 or IPv6)")
 	cmd.Flags().BoolVarP(&ignoreCase, "ignore-case", "i", false, "Ignore case when matching (default is false)")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "raw", "Output format. One of (raw, json, yaml). `.")
+	cmd.Flags().BoolVar(&noHeaders, "no-headers", false, "Do not print headers in the output")
 	return cmd
 }
 

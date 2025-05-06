@@ -10,8 +10,9 @@ func New() *cobra.Command {
 		Short: "Manage servers",
 		Long:  "Manage servers",
 	}
-	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewGetCommand())
+	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewNumberCommand())
+	cmd.AddCommand(NewRenameCommand())
 	return cmd
 }

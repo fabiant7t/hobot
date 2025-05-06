@@ -14,39 +14,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewGetCommand() *cobra.Command {
+func NewRenameCommand() *cobra.Command {
 	var (
 		noHeaders    bool
 		outputFormat string
 	)
 	cmd := &cobra.Command{
-		Use:   "get [SERVER_NUMBER]",
-		Short: "Get server",
-		Long:  "Get server",
+		Use:   "rename [SERVER_NUMBER] [NAME]",
+		Short: "Rename server",
+		Long:  "Rename server",
 		Example: strings.Join([]string{
-			"hobot server get 123456",
-			"hobot server get 123456 -o table --no-headers",
-			"hobot server get 123456 -o table=ServerNumber,ServerIP,ServerName",
-			"hobot server get 123456 -o json",
-			"hobot server get 123456 -o yaml",
+			"hobot server rename 123456 marvin",
+			`hobot server rename 123456 "Deep Thought"`,
+			`hobot server rename 123456 "Deep Thought"`,
 		}, "\n"),
-		Args: cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 			defer cancel()
 
 			serverNumber, err := strconv.Atoi(args[0])
 			cobra.CheckErr(err)
-			srv, err := server.GetServer(
+			serverName := args[1]
+			srv, err := server.RenameServer(
 				ctx,
 				serverNumber,
+				serverName,
 				cmd.Context().Value("user").(string),
 				cmd.Context().Value("password").(string),
 				&http.Client{},
 			)
-			if err != nil {
-				cobra.CheckErr(fmt.Errorf("error getting server: %w", err))
-			}
+			cobra.CheckErr(err)
+
 			var p printer.RendererPrinter[server.DetailedServer]
 			switch outputFormat {
 			case "json":

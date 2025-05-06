@@ -23,7 +23,7 @@ func NewListCommand() *cobra.Command {
 		Short:   "List servers",
 		Long:    "List servers",
 		Example: "hobot server list",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 			defer cancel()
 
@@ -34,7 +34,7 @@ func NewListCommand() *cobra.Command {
 				&http.Client{},
 			)
 			if err != nil {
-				return fmt.Errorf("error listing servers: %w", err)
+				cobra.CheckErr(fmt.Errorf("error listing servers: %w", err))
 			}
 			var p printer.RendererPrinter[*server.Server]
 			switch outputFormat {
@@ -50,9 +50,8 @@ func NewListCommand() *cobra.Command {
 				p = tp
 			}
 			if err := p.PrintAll(servers, os.Stdout); err != nil {
-				return fmt.Errorf("error printing all servers: %w", err)
+				cobra.CheckErr(fmt.Errorf("error printing all servers: %w", err))
 			}
-			return nil
 		},
 	}
 	cmd.Flags().BoolVar(&noHeaders, "no-headers", false, "Do not print headers in the output")
