@@ -14,7 +14,7 @@ hobot server rescue options [SERVER_NUMBER] [flags]
 
 ```
 hobot server rescue options 123456
-hobot server rescue options 123456 -o table=ServerNumber,OS
+hobot server rescue options 123456 -o table=ServerNumber,OSList
 hobot server rescue options 123456 -o table=ServerNumber,Active --no-headers
 hobot server rescue options 123456 -o json
 hobot server rescue options 123456 -o yaml
