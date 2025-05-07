@@ -6,7 +6,7 @@ func TestMatchServer(t *testing.T) {
 	for _, tc := range []struct {
 		testName   string
 		srvName    string
-		srvIPs     []string
+		srvIPList  []string
 		queryName  string
 		queryIP    string
 		ignoreCase bool
@@ -21,7 +21,7 @@ func TestMatchServer(t *testing.T) {
 		{"Search by IP and name, only ip matches", "marvin", []string{"1.2.3.4"}, "deep thought", "1.2.3.4", false, false},
 		{"Search by IP and name, only name matches", "marvin", []string{"1.2.3.4"}, "marvin", "44.33.22.11", false, false},
 	} {
-		if got, want := matchServer(tc.srvName, tc.srvIPs, tc.queryName, tc.queryIP, tc.ignoreCase), tc.want; got != want {
+		if got, want := matchServer(tc.srvName, tc.srvIPList, tc.queryName, tc.queryIP, tc.ignoreCase), tc.want; got != want {
 			t.Errorf("%s: Got %t, want %t", tc.testName, got, want)
 		}
 	}

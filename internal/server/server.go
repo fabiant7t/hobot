@@ -1,7 +1,5 @@
 package server
 
-import "fmt"
-
 // ServerWrapper: API responses do wrap the servers.
 type ServerWrapper struct {
 	Server Server `json:"server"`
@@ -19,16 +17,8 @@ type Server struct {
 	Status        string    `json:"status" yaml:"status"`
 	Cancelled     bool      `json:"cancelled" yaml:"cancelled"`
 	PaidUntil     string    `json:"paid_until" yaml:"paid_until"`
-	IPs           []string  `json:"ip" yaml:"ip"`
-	Subnets       *[]Subnet `json:"subnet" yaml:"subnet"`
-}
-
-func (srv *Server) String() string {
-	name := srv.ServerName
-	if name == "" {
-		name = "[unnamed]"
-	}
-	return fmt.Sprintf("%-41s %-17s %-10s %-8s", name, srv.ServerIP, srv.DC, fmt.Sprintf("%d", srv.ServerNumber))
+	IPList        []string  `json:"ip" yaml:"ip"`
+	SubnetList    *[]Subnet `json:"subnet" yaml:"subnet"`
 }
 
 // DetailedServerWrapper: API responses do wrap the server.
@@ -48,8 +38,8 @@ type DetailedServer struct {
 	Status           string    `json:"status" yaml:"status"`
 	Cancelled        bool      `json:"cancelled" yaml:"cancelled"`
 	PaidUntil        string    `json:"paid_until" yaml:"paid_until"`
-	IPs              []string  `json:"ip" yaml:"ip"`
-	Subnets          *[]Subnet `json:"subnet" yaml:"subnet"`
+	IPList           []string  `json:"ip" yaml:"ip"`
+	SubnetList       *[]Subnet `json:"subnet" yaml:"subnet"`
 	Reset            bool      `json:"reset" yaml:"reset"`
 	Rescue           bool      `json:"rescue" yaml:"rescue"`
 	VNC              bool      `json:"vnc" yaml:"vnc"`
@@ -59,14 +49,6 @@ type DetailedServer struct {
 	WOL              bool      `json:"wol" yaml:"wol"`
 	HotSwap          bool      `json:"hot_swap" yaml:"hot_swap"`
 	LinkedStorageBox int       `json:"linked_storagebox" yaml:"linked_storagebox"`
-}
-
-func (srv *DetailedServer) String() string {
-	name := srv.ServerName
-	if name == "" {
-		name = "[unnamed]"
-	}
-	return fmt.Sprintf("%-41s %-17s %-10s %-8s", name, srv.ServerIP, srv.DC, fmt.Sprintf("%d", srv.ServerNumber))
 }
 
 type Subnet struct {

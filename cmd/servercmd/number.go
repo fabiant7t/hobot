@@ -59,7 +59,7 @@ func NewNumberCommand() *cobra.Command {
 
 			var matchingSrvs []*server.Server
 			for _, srv := range srvs {
-				if matchServer(srv.ServerName, srv.IPs, name, ip, ignoreCase) {
+				if matchServer(srv.ServerName, srv.IPList, name, ip, ignoreCase) {
 					matchingSrvs = append(matchingSrvs, srv)
 				}
 			}
@@ -100,7 +100,7 @@ func NewNumberCommand() *cobra.Command {
 	return cmd
 }
 
-func matchServer(srvName string, srvIPs []string, queryName, queryIP string, ignoreCase bool) bool {
+func matchServer(srvName string, srvIPList []string, queryName, queryIP string, ignoreCase bool) bool {
 	// either name or ip should be set (caller should error out)
 	if queryName == "" && queryIP == "" {
 		return false
@@ -114,7 +114,7 @@ func matchServer(srvName string, srvIPs []string, queryName, queryIP string, ign
 	if queryIP != "" {
 		queryIP = strings.ToLower(queryIP)
 		ipMatch := false
-		for _, srvIP := range srvIPs {
+		for _, srvIP := range srvIPList {
 			if strings.ToLower(srvIP) == queryIP {
 				ipMatch = true
 				break
