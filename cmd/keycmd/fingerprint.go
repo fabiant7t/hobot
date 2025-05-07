@@ -36,7 +36,7 @@ func NewFingerprintCommand() *cobra.Command {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
 			defer cancel()
 
-			name := strings.ReplaceAll(args[0], " ", "-")
+			name := sanitizeName(args[0])
 
 			fingerprint, err := key.GetFingerprint(
 				ctx,

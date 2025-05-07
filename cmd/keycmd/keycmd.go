@@ -10,8 +10,9 @@ func New() *cobra.Command {
 		Short: "Manage SSH keys",
 		Long:  "Manage SSH keys",
 	}
-	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewCreateCommand())
 	cmd.AddCommand(NewFingerprintCommand())
+	cmd.AddCommand(NewGetCommand())
+	cmd.AddCommand(NewListCommand())
 	return cmd
 }

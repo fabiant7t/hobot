@@ -121,3 +121,40 @@ func GetFingerprint(ctx context.Context, name, user, password string, client *ht
 	}
 	return matchingKeys[0].Fingerprint, nil
 }
+
+func GetKey(ctx context.Context, fingerprint, user, password string, client *http.Client) (*Key, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://robot-ws.your-server.de/key/%s", fingerprint), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return nil, errors.New("no keys found")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var keyWrapper KeyWrapper
+	err = json.Unmarshal(b, &keyWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &keyWrapper.Key, nil
+}
