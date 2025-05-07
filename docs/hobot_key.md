@@ -24,6 +24,7 @@ Manage SSH keys
 
 * [hobot](hobot.md)	 - Hetzner Robot API CLI
 * [hobot key create](hobot_key_create.md)	 - Create SSH key
+* [hobot key delete](hobot_key_delete.md)	 - Delete SSH key
 * [hobot key fingerprint](hobot_key_fingerprint.md)	 - Get fingerprint of SSH key
 * [hobot key get](hobot_key_get.md)	 - Get SSH key
 * [hobot key list](hobot_key_list.md)	 - List SSH keys

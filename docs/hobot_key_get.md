@@ -13,11 +13,11 @@ hobot key get [FINGERPRINT] [flags]
 ### Examples
 
 ```
-hobot get [FINGERPRINT]
-hobot get [FINGERPRINT] --no-headers
-hobot get [FINGERPRINT] -o table=CreatedAt,Name --no-headers
-hobot get [FINGERPRINT] -o json
-hobot get [FINGERPRINT] -o yaml
+hobot key get [FINGERPRINT]
+hobot key get [FINGERPRINT] --no-headers
+hobot key get [FINGERPRINT] -o table=CreatedAt,Name --no-headers
+hobot key get [FINGERPRINT] -o json
+hobot key get [FINGERPRINT] -o yaml
 ```
 
 ### Options

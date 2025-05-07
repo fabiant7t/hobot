@@ -115,9 +115,9 @@ func GetFingerprint(ctx context.Context, name, user, password string, client *ht
 		}
 	}
 	if n := len(matchingKeys); n == 0 {
-		return "", errors.New("Key not found")
+		return "", errors.New("key not found")
 	} else if n > 1 {
-		return "", errors.New("More than one key found")
+		return "", errors.New("more than one key found")
 	}
 	return matchingKeys[0].Fingerprint, nil
 }
@@ -139,7 +139,7 @@ func GetKey(ctx context.Context, fingerprint, user, password string, client *htt
 
 	switch res.StatusCode {
 	case http.StatusNotFound:
-		return nil, errors.New("no keys found")
+		return nil, errors.New("key not found")
 	case http.StatusUnauthorized:
 		return nil, errors.New("unauthorized: check your your credentials")
 	case http.StatusOK: // happy path, NOOP
@@ -157,4 +157,31 @@ func GetKey(ctx context.Context, fingerprint, user, password string, client *htt
 		return nil, err
 	}
 	return &keyWrapper.Key, nil
+}
+
+func DeleteKey(ctx context.Context, fingerprint, user, password string, client *http.Client) error {
+	if client == nil {
+		client = &http.Client{}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://robot-ws.your-server.de/key/%s", fingerprint), nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return errors.New("no key found")
+	case http.StatusUnauthorized:
+		return errors.New("unauthorized: check your your credentials")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+	return nil
 }
