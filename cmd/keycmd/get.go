@@ -24,11 +24,11 @@ func NewGetCommand() *cobra.Command {
 		Long:  "Get SSH key",
 		Args:  cobra.ExactArgs(1),
 		Example: strings.Join([]string{
-			"hobot get [FINGERPRINT]",
-			"hobot get [FINGERPRINT] --no-headers",
-			"hobot get [FINGERPRINT] -o table=CreatedAt,Name --no-headers",
-			"hobot get [FINGERPRINT] -o json",
-			"hobot get [FINGERPRINT] -o yaml",
+			"hobot key get [FINGERPRINT]",
+			"hobot key get [FINGERPRINT] --no-headers",
+			"hobot key get [FINGERPRINT] -o table=CreatedAt,Name --no-headers",
+			"hobot key get [FINGERPRINT] -o json",
+			"hobot key get [FINGERPRINT] -o yaml",
 		}, "\n"),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
