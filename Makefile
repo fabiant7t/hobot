@@ -1,6 +1,14 @@
-VERSION := $(shell git tag --points-at HEAD --sort=-version:refname)
-	
 build:
-	go build \
-	  -ldflags "-X github.com/fabiant7t/hobot/cmd.Version=${VERSION}" \
-	  -o hobot
+	go build -o hobotdev
+
+release: clean
+	goreleaser release --clean
+
+clean:
+	rm -rf dist
+
+docs:
+	rm -rf docs
+	go run main.go docs
+
+.PHONY: docs
