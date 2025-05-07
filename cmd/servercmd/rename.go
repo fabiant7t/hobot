@@ -26,7 +26,8 @@ func NewRenameCommand() *cobra.Command {
 		Example: strings.Join([]string{
 			"hobot server rename 123456 marvin",
 			`hobot server rename 123456 "Deep Thought"`,
-			`hobot server rename 123456 "Deep Thought"`,
+			`hobot server rename 123456 marvin -o json`,
+			`hobot server rename 123456 marvin -o yaml`,
 		}, "\n"),
 		Args: cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
