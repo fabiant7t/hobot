@@ -28,11 +28,11 @@ import (
 
 	"github.com/fabiant7t/hobot/cmd"
 	"github.com/fabiant7t/hobot/cmd/configcmd"
+	"github.com/fabiant7t/hobot/cmd/docscmd"
 	"github.com/fabiant7t/hobot/cmd/servercmd"
 	"github.com/fabiant7t/hobot/internal/configfile"
 	"github.com/fabiant7t/hobot/internal/statefile"
 	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/doc"
 )
 
 var (
@@ -100,13 +100,7 @@ func main() {
 	rootCmd.AddCommand(configcmd.New())
 	rootCmd.AddCommand(servercmd.New())
 	rootCmd.AddCommand(cmd.VersionCmd)
-	rootCmd.AddCommand(&cobra.Command{
-		Use:   "docs",
-		Short: "Generate documentation files",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return doc.GenMarkdownTree(rootCmd, "./docs")
-		},
-	})
+	rootCmd.AddCommand(docscmd.New(rootCmd, "./docs"))
 
 	if err = rootCmd.Execute(); err != nil {
 		os.Exit(1)
