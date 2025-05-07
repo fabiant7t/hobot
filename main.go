@@ -29,6 +29,7 @@ import (
 	"github.com/fabiant7t/hobot/cmd"
 	"github.com/fabiant7t/hobot/cmd/configcmd"
 	"github.com/fabiant7t/hobot/cmd/docscmd"
+	"github.com/fabiant7t/hobot/cmd/keycmd"
 	"github.com/fabiant7t/hobot/cmd/servercmd"
 	"github.com/fabiant7t/hobot/internal/configfile"
 	"github.com/fabiant7t/hobot/internal/statefile"
@@ -101,6 +102,7 @@ func main() {
 	rootCmd.AddCommand(servercmd.New())
 	rootCmd.AddCommand(cmd.VersionCmd)
 	rootCmd.AddCommand(docscmd.New(rootCmd, "./docs"))
+	rootCmd.AddCommand(keycmd.New())
 
 	if err = rootCmd.Execute(); err != nil {
 		os.Exit(1)

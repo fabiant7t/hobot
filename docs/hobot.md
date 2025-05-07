@@ -20,6 +20,7 @@ A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt
 * [hobot completion](hobot_completion.md)	 - Generate the autocompletion script for the specified shell
 * [hobot config](hobot_config.md)	 - Configure the context
 * [hobot docs](hobot_docs.md)	 - Generate documentation files
+* [hobot key](hobot_key.md)	 - Manage SSH keys
 * [hobot server](hobot_server.md)	 - Manage servers
 * [hobot version](hobot_version.md)	 - Print the version number
 
