@@ -253,7 +253,7 @@ func GetRescueOption(ctx context.Context, serverNumber int, user, password strin
 	return &rescueOptionWrapper.RescueOption, nil
 }
 
-func ActivateRescue(ctx context.Context, serverNumber int, osType string, authorizedKeys []string, keyboardLayout, user, password string, client *http.Client) (*RescueActivated, error) {
+func ActivateRescue(ctx context.Context, serverNumber int, osType string, authorizedKeys []string, keyboardLayout, user, password string, client *http.Client) (*RescueSetting, error) {
 	if client == nil {
 		client = &http.Client{}
 	}
@@ -293,10 +293,49 @@ func ActivateRescue(ctx context.Context, serverNumber int, osType string, author
 	if err != nil {
 		return nil, err
 	}
-	var rescueActivatedWrapper RescueActivatedWrapper
-	err = json.Unmarshal(b, &rescueActivatedWrapper)
+	var rescueSettingWrapper RescueSettingWrapper
+	err = json.Unmarshal(b, &rescueSettingWrapper)
 	if err != nil {
 		return nil, err
 	}
-	return &rescueActivatedWrapper.RescueActivated, nil
+	return &rescueSettingWrapper.RescueSettings, nil
+}
+
+func RescueStatus(ctx context.Context, serverNumber int, user, password string, client *http.Client) (*RescueSetting, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://robot-ws.your-server.de/boot/%d/rescue", serverNumber), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusBadRequest:
+		return nil, fmt.Errorf("invalid input")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("server %d not found or no boot option available", serverNumber)
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var rescueSettingWrapper RescueSettingWrapper
+	err = json.Unmarshal(b, &rescueSettingWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &rescueSettingWrapper.RescueSettings, nil
 }

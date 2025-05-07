@@ -12,5 +12,6 @@ func New() *cobra.Command {
 	}
 	cmd.AddCommand(NewActivateCommand())
 	cmd.AddCommand(NewOptionsCommand())
+	cmd.AddCommand(NewStatusCommand())
 	return cmd
 }

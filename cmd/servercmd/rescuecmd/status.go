@@ -14,21 +14,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewOptionsCommand() *cobra.Command {
+func NewStatusCommand() *cobra.Command {
 	var (
 		noHeaders    bool
 		outputFormat string
 	)
 	cmd := &cobra.Command{
-		Use:   "options [SERVER_NUMBER]",
-		Short: "List rescue boot options",
-		Long:  "List rescue boot options",
+		Use:   "status [SERVER_NUMBER]",
+		Short: "Get rescue boot setting",
+		Long:  "Get rescue boot setting",
 		Example: strings.Join([]string{
-			"hobot server rescue options 123456",
-			"hobot server rescue options 123456 -o table=ServerNumber,OSList",
-			"hobot server rescue options 123456 -o table=ServerNumber,Active --no-headers",
-			"hobot server rescue options 123456 -o json",
-			"hobot server rescue options 123456 -o yaml",
+			"hobot server rescue status 123456",
+			"hobot server rescue status 123456 -o table=ServerNumber,Active,Password",
+			"hobot server rescue status 123456 -o table=Password --no-headers",
+			"hobot server rescue status 123456 -o json",
+			"hobot server rescue status 123456 -o yaml",
 		}, "\n"),
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -40,7 +40,7 @@ func NewOptionsCommand() *cobra.Command {
 				cobra.CheckErr(fmt.Errorf("Cannot convert server number %s to int: %w", args[0], err))
 			}
 
-			rescueOption, err := server.GetRescueOption(
+			rescueSetting, err := server.RescueStatus(
 				ctx,
 				serverNumber,
 				cmd.Context().Value("user").(string),
@@ -51,21 +51,21 @@ func NewOptionsCommand() *cobra.Command {
 				cobra.CheckErr(fmt.Errorf("error getting rescue option: %w", err))
 			}
 
-			var p printer.RendererPrinter[server.RescueOption]
+			var p printer.RendererPrinter[server.RescueSetting]
 			switch outputFormat {
 			case "json":
-				p = &printer.JSONPrinter[server.RescueOption]{}
+				p = &printer.JSONPrinter[server.RescueSetting]{}
 			case "yaml":
-				p = &printer.YAMLPrinter[server.RescueOption]{}
+				p = &printer.YAMLPrinter[server.RescueSetting]{}
 			default:
-				tp := &printer.TablePrinter[server.RescueOption]{WithHeader: !noHeaders}
+				tp := &printer.TablePrinter[server.RescueSetting]{WithHeader: !noHeaders}
 				if after, found := strings.CutPrefix(outputFormat, "table="); found {
 					tp.SetFieldNames(strings.Split(after, ","))
 				}
 				p = tp
 			}
-			if err := p.Print(*rescueOption, os.Stdout); err != nil {
-				cobra.CheckErr(fmt.Errorf("error printing rescue options: %w", err))
+			if err := p.Print(*rescueSetting, os.Stdout); err != nil {
+				cobra.CheckErr(fmt.Errorf("error printing rescue status: %w", err))
 			}
 		},
 	}

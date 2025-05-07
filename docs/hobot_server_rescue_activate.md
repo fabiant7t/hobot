@@ -1,10 +1,10 @@
 ## hobot server rescue activate
 
-List activate options
+Activate rescue boot
 
 ### Synopsis
 
-List activate options
+Activate rescue boot
 
 ```
 hobot server rescue activate [SERVER_NUMBER] [flags]

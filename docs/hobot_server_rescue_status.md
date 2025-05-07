@@ -1,29 +1,29 @@
-## hobot server rescue options
+## hobot server rescue status
 
-List rescue boot options
+Get rescue boot setting
 
 ### Synopsis
 
-List rescue boot options
+Get rescue boot setting
 
 ```
-hobot server rescue options [SERVER_NUMBER] [flags]
+hobot server rescue status [SERVER_NUMBER] [flags]
 ```
 
 ### Examples
 
 ```
-hobot server rescue options 123456
-hobot server rescue options 123456 -o table=ServerNumber,OSList
-hobot server rescue options 123456 -o table=ServerNumber,Active --no-headers
-hobot server rescue options 123456 -o json
-hobot server rescue options 123456 -o yaml
+hobot server rescue status 123456
+hobot server rescue status 123456 -o table=ServerNumber,Active,Password
+hobot server rescue status 123456 -o table=Password --no-headers
+hobot server rescue status 123456 -o json
+hobot server rescue status 123456 -o yaml
 ```
 
 ### Options
 
 ```
-  -h, --help                       help for options
+  -h, --help                       help for status
       --no-headers                 Do not print headers in the output
   -o, --output table=Foo,Bar,Baz   Output format. One of (table, json, yaml). Table also supports selecting custom fields using the syntax table=Foo,Bar,Baz. (default "table")
 ```
