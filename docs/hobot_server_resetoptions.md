@@ -14,8 +14,8 @@ hobot server resetoptions [SERVER_NUMBER] [flags]
 
 ```
 hobot server resetoptions 123456
-hobot server resetoptions 123456 -o table=ServerNumber,Types,OperatingStatus
-hobot server resetoptions 123456 -o table=ServerNumber,Types,OperatingStatus --no-headers
+hobot server resetoptions 123456 -o table=ServerNumber,TypeList,OperatingStatus
+hobot server resetoptions 123456 -o table=ServerNumber,TypeList,OperatingStatus --no-headers
 hobot server resetoptions 123456 -o json
 hobot server resetoptions 123456 -o yaml
 ```
