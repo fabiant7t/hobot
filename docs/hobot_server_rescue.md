@@ -24,6 +24,7 @@ Manage server rescue
 
 * [hobot server](hobot_server.md)	 - Manage servers
 * [hobot server rescue activate](hobot_server_rescue_activate.md)	 - Activate rescue boot
+* [hobot server rescue deactivate](hobot_server_rescue_deactivate.md)	 - Deactivate rescue boot
 * [hobot server rescue options](hobot_server_rescue_options.md)	 - List rescue boot options
 * [hobot server rescue status](hobot_server_rescue_status.md)	 - Get rescue boot setting
 

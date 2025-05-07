@@ -11,6 +11,7 @@ func New() *cobra.Command {
 		Long:  "Manage server rescue",
 	}
 	cmd.AddCommand(NewActivateCommand())
+	cmd.AddCommand(NewDeactivateCommand())
 	cmd.AddCommand(NewOptionsCommand())
 	cmd.AddCommand(NewStatusCommand())
 	return cmd

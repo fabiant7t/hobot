@@ -339,3 +339,44 @@ func RescueStatus(ctx context.Context, serverNumber int, user, password string, 
 	}
 	return &rescueSettingWrapper.RescueSettings, nil
 }
+
+func DeactivateRescue(ctx context.Context, serverNumber int, user, password string, client *http.Client) (*RescueSetting, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://robot-ws.your-server.de/boot/%d/rescue", serverNumber), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusBadRequest:
+		return nil, fmt.Errorf("invalid input")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("server %d not found or no boot option available", serverNumber)
+	case http.StatusInternalServerError:
+		return nil, errors.New("boot deactivation failed due to internal server error")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var rescueSettingWrapper RescueSettingWrapper
+	err = json.Unmarshal(b, &rescueSettingWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &rescueSettingWrapper.RescueSettings, nil
+}
