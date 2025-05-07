@@ -217,3 +217,40 @@ func ResetServer(ctx context.Context, serverNumber int, resetType string, user, 
 	}
 	return &resetWrapper.Reset, nil
 }
+
+func GetRescueOption(ctx context.Context, serverNumber int, user, password string, client *http.Client) (*RescueOption, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://robot-ws.your-server.de/boot/%d/rescue", serverNumber), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("server %d not found or no boot option available", serverNumber)
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var rescueOptionWrapper RescueOptionWrapper
+	err = json.Unmarshal(b, &rescueOptionWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &rescueOptionWrapper.RescueOption, nil
+}

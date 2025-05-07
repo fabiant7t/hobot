@@ -1,6 +1,7 @@
 package servercmd
 
 import (
+	"github.com/fabiant7t/hobot/cmd/servercmd/rescuecmd"
 	"github.com/spf13/cobra"
 )
 
@@ -16,5 +17,6 @@ func New() *cobra.Command {
 	cmd.AddCommand(NewRenameCommand())
 	cmd.AddCommand(NewResetCommand())
 	cmd.AddCommand(NewResetOptionsCommand())
+	cmd.AddCommand(rescuecmd.New())
 	return cmd
 }

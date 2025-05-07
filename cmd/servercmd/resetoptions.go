@@ -45,7 +45,7 @@ func NewResetOptionsCommand() *cobra.Command {
 				&http.Client{},
 			)
 			if err != nil {
-				cobra.CheckErr(fmt.Errorf("error getting reset options: %w", err))
+				cobra.CheckErr(fmt.Errorf("error getting reset option: %w", err))
 			}
 			var p printer.RendererPrinter[server.ResetOption]
 			switch outputFormat {

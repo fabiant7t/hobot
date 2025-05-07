@@ -27,6 +27,7 @@ Manage servers
 * [hobot server list](hobot_server_list.md)	 - List servers
 * [hobot server number](hobot_server_number.md)	 - Get server number
 * [hobot server rename](hobot_server_rename.md)	 - Rename server
+* [hobot server rescue](hobot_server_rescue.md)	 - Manage server rescue
 * [hobot server reset](hobot_server_reset.md)	 - Reset server
 * [hobot server resetoptions](hobot_server_resetoptions.md)	 - Reset options of server
 
