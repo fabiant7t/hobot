@@ -29,17 +29,19 @@ Pretty-printed JSON output.
 #### yaml
 YAML-formatted output.
 
+### Output processing
+
 In the spirit of UNIX pipelines, use the right tool for each format:
 
 For CSV/table data:
-– [cut](https://www.gnu.org/software/coreutils/manual/html_node/The-cut-command.html)
-– [awk](https://www.gnu.org/software/gawk/manual/gawk.html)
-– [csvtk](https://github.com/shenwei356/csvtk)
+* [cut](https://www.gnu.org/software/coreutils/manual/html_node/The-cut-command.html)
+* [awk](https://www.gnu.org/software/gawk/manual/gawk.html)
+* [csvtk](https://github.com/shenwei356/csvtk)
 
 For JSON data:
-– [jq](https://github.com/jqlang/jq)
+* [jq](https://github.com/jqlang/jq)
 
 For YAML data:
-– [yq](https://github.com/mikefarah/yq)
+* [yq](https://github.com/mikefarah/yq)
 
 Pipe Hobot’s output into these utilities when building your scripts!
