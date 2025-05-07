@@ -24,6 +24,8 @@ go.work.sum
 # env file
 .env
 
+*.pem
+*.pub
 .DS_Store
 build/
 dist/

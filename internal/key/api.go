@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"sort"
+	"strings"
 )
 
 func ListKeys(ctx context.Context, user, password string, client *http.Client) ([]*Key, error) {
@@ -52,4 +54,48 @@ func ListKeys(ctx context.Context, user, password string, client *http.Client) (
 		return keys[i].Name < keys[j].Name
 	})
 	return keys, nil
+}
+
+func CreateKey(ctx context.Context, name, authKey, user, password string, client *http.Client) (*Key, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	data := url.Values{}
+	data.Set("name", name)
+	data.Set("data", authKey)
+	data.Encode()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://robot-ws.your-server.de/key", strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusBadRequest:
+		return nil, fmt.Errorf("key cannot be created")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusConflict:
+		return nil, errors.New("key already exists")
+	case http.StatusCreated: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var keyWrapper KeyWrapper
+	err = json.Unmarshal(b, &keyWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &keyWrapper.Key, nil
 }

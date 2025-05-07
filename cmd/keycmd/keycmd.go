@@ -11,5 +11,6 @@ func New() *cobra.Command {
 		Long:  "Manage SSH keys",
 	}
 	cmd.AddCommand(NewListCommand())
+	cmd.AddCommand(NewCreateCommand())
 	return cmd
 }
