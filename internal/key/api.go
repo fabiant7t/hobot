@@ -99,3 +99,25 @@ func CreateKey(ctx context.Context, name, authKey, user, password string, client
 	}
 	return &keyWrapper.Key, nil
 }
+
+func GetFingerprint(ctx context.Context, name, user, password string, client *http.Client) (string, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	keys, err := ListKeys(ctx, user, password, client)
+	if err != nil {
+		return "", fmt.Errorf("error listing keys: %w", err)
+	}
+	var matchingKeys []*Key
+	for _, k := range keys {
+		if k.Name == name {
+			matchingKeys = append(matchingKeys, k)
+		}
+	}
+	if n := len(matchingKeys); n == 0 {
+		return "", errors.New("Key not found")
+	} else if n > 1 {
+		return "", errors.New("More than one key found")
+	}
+	return matchingKeys[0].Fingerprint, nil
+}

@@ -12,5 +12,6 @@ func New() *cobra.Command {
 	}
 	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewCreateCommand())
+	cmd.AddCommand(NewFingerprintCommand())
 	return cmd
 }
