@@ -10,6 +10,7 @@ func New() *cobra.Command {
 		Short: "Manage server rescue",
 		Long:  "Manage server rescue",
 	}
+	cmd.AddCommand(NewActivateCommand())
 	cmd.AddCommand(NewOptionsCommand())
 	return cmd
 }

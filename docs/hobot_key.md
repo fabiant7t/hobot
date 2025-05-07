@@ -15,9 +15,9 @@ Manage SSH keys
 ### Options inherited from parent commands
 
 ```
-      --config string    config file (default is "/Users/fabian/.config/hobot/config.ini")
+      --config string    config file (default is "/home/fabian/.config/hobot/config.ini")
       --context string   default is read from state file or "default"
-      --state string     state file (default is "/Users/fabian/.local/state/hobot/state.ini")
+      --state string     state file (default is "/home/fabian/.local/state/hobot/state.ini")
 ```
 
 ### SEE ALSO

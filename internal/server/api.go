@@ -99,7 +99,6 @@ func RenameServer(ctx context.Context, serverNumber int, serverName, user, passw
 	}
 	data := url.Values{}
 	data.Set("server_name", serverName)
-	data.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://robot-ws.your-server.de/server/%d", serverNumber), strings.NewReader(data.Encode()))
 	if err != nil {
 		return nil, err
@@ -177,7 +176,6 @@ func ResetServer(ctx context.Context, serverNumber int, resetType string, user, 
 	}
 	data := url.Values{}
 	data.Set("type", resetType)
-	data.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://robot-ws.your-server.de/reset/%d", serverNumber), strings.NewReader(data.Encode()))
 	if err != nil {
 		return nil, err
@@ -253,4 +251,52 @@ func GetRescueOption(ctx context.Context, serverNumber int, user, password strin
 		return nil, err
 	}
 	return &rescueOptionWrapper.RescueOption, nil
+}
+
+func ActivateRescue(ctx context.Context, serverNumber int, osType string, authorizedKeys []string, keyboardLayout, user, password string, client *http.Client) (*RescueActivated, error) {
+	if client == nil {
+		client = &http.Client{}
+	}
+	data := url.Values{}
+	data.Set("keyboard", keyboardLayout)
+	data.Set("os", osType)
+	for _, authorizedKey := range authorizedKeys {
+		data.Add("authorized_key[]", authorizedKey)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://robot-ws.your-server.de/boot/%d/rescue", serverNumber), strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(user, password)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusBadRequest:
+		return nil, fmt.Errorf("invalid input")
+	case http.StatusUnauthorized:
+		return nil, errors.New("unauthorized: check your your credentials")
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("server %d not found or no boot option available", serverNumber)
+	case http.StatusInternalServerError:
+		return nil, errors.New("boot activation failed due to internal error")
+	case http.StatusOK: // happy path, NOOP
+	default: // unexpected status code
+		return nil, fmt.Errorf("API responded with HTTP status code %d", res.StatusCode)
+	}
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var rescueActivatedWrapper RescueActivatedWrapper
+	err = json.Unmarshal(b, &rescueActivatedWrapper)
+	if err != nil {
+		return nil, err
+	}
+	return &rescueActivatedWrapper.RescueActivated, nil
 }
