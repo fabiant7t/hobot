@@ -13,7 +13,9 @@ var currentContextCommand = &cobra.Command{
 	Example: "hobot config current-context",
 	Run: func(cmd *cobra.Command, args []string) {
 		context, err := cmd.Flags().GetString("context")
-		cobra.CheckErr(fmt.Errorf("error: cannot get context flag: %w", err))
+		if err != nil {
+			cobra.CheckErr(fmt.Errorf("error: cannot get context flag: %w", err))
+		}
 		fmt.Println(context)
 	},
 }
