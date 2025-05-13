@@ -2,6 +2,7 @@ package configcmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/fabiant7t/hobot/internal/configfile"
 	"github.com/fabiant7t/hobot/internal/statefile"
@@ -37,6 +38,6 @@ var useContextCommand = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("error: cannot get state flag: %w", err))
 		}
 		cobra.CheckErr(statefile.SetContext(state, contextName))
-		fmt.Printf("Switched to context \"%s\".\n", contextName)
+		os.Stderr.WriteString(fmt.Sprintf("Switched to context \"%s\".\n", contextName))
 	},
 }
