@@ -5,6 +5,8 @@ Hetzner Robot API CLI
 ### Synopsis
 A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt
 
+![a person with a laptop using hobot](image.png)
+
 ### Usage 
 
 All of the usage docs live in [docs/hobot.md](docs/hobot.md) ↗
