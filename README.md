@@ -3,7 +3,7 @@
 Hetzner Robot API CLI
 
 ### Synopsis
-A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt
+A CLI to interact with the Hetzner Robot API - Copyright 2025-2026 Fabian Topfstedt
 
 ![a person with a laptop using hobot](image.png)
 

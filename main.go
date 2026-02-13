@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Fabian Topfstedt
+Copyright © 2025-2026 Fabian Topfstedt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ func main() {
 	rootCmd := &cobra.Command{
 		Use:   "hobot COMMAND SUBCOMMAND [options]",
 		Short: "Hetzner Robot API CLI",
-		Long:  "A CLI to interact with the Hetzner Robot API - Copyright 2025 Fabian Topfstedt",
+		Long:  "A CLI to interact with the Hetzner Robot API - Copyright 2025-2026 Fabian Topfstedt",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			// Set user and password as context values for sub commands to use
 			configFile, err := cmd.Flags().GetString("config")
