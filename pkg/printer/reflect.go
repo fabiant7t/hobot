@@ -9,7 +9,7 @@ import (
 // at runtime without panicking.
 func FieldMap(anystruct any) (map[string]any, error) {
 	val, typ := reflect.ValueOf(anystruct), reflect.TypeOf(anystruct)
-	if val.Kind() == reflect.Ptr {
+	if val.Kind() == reflect.Pointer {
 		val = val.Elem()
 		typ = typ.Elem()
 	}
@@ -30,7 +30,7 @@ func FieldMap(anystruct any) (map[string]any, error) {
 // at runtime without panicking.
 func FieldNames(anystruct any) ([]string, error) {
 	val, typ := reflect.ValueOf(anystruct), reflect.TypeOf(anystruct)
-	if val.Kind() == reflect.Ptr { // dereference a pointer
+	if val.Kind() == reflect.Pointer { // dereference a pointer
 		val = val.Elem()
 		typ = typ.Elem()
 	}
